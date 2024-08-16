@@ -4,11 +4,37 @@ import { MdClose } from 'react-icons/md';
 
 // This is Modal for when the user wants to make a new note
 
-const AddEditNotes = ({onClose}) => {
+const AddEditNotes = ({noteData, type, onClose}) => {
 
   const [title, setTitle] = useState('');
   const [content, setContent] = useState('');
   const [tags, setTags] = useState([]);
+  const [error, setError] = useState('');
+
+  const addNewNote = async () => {};
+  const editNote = async () => {};
+
+  const handleAddNote = () => {
+    if (!title){
+      setError("Please add a Title.");
+      return;
+    }
+
+    if (!content) {
+      setError("Please add a brief Description");
+      return;
+    }
+
+    setError("");
+
+    if (type == 'edit'){
+      editNote();
+    }
+    else{
+      addNewNote();
+    }
+
+  }
 
   return (
     <div className='relative'>
@@ -30,7 +56,9 @@ const AddEditNotes = ({onClose}) => {
           <TagInput tags={tags} setTags={setTags} />
       </div>
 
-      <button className='btn-primary font-medium mt-5 p-3' onClick={() => {}}>ADD</button>
+      {error && <p className='text-red-500 text-xs pt-4'>{error}</p>}
+
+      <button className='btn-primary font-medium mt-5 p-3' onClick={handleAddNote}>ADD</button>
     </div>
   )
 }
