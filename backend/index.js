@@ -6,6 +6,7 @@ const jwt = require("jsonwebtoken");
 const { authenticateToken } = require("./utils");
 const User = require("./models/user.model");
 const Note = require("./models/note.model");
+const { TbRulerMeasure } = require("react-icons/tb");
 
 mongoose.connect(process.env.CONNECTION_STRING);
 
@@ -150,6 +151,52 @@ app.post("/add-note", authenticateToken, async (req, res) => {
     });
   }
 });
+
+app.put("/edit-note/:noteId", authenticateToken, async (req, res) => {
+
+    const noteId = req.params.noteId;
+    const {title, content, tags, isPinned} = req.body;
+    const {user} = req.user;
+
+    if (!title && !content && !tags){
+        return res.status(400).json({
+            error: true,
+            message: "No changes provided"
+        })
+    }
+
+    try {
+        const note = await Note.findOne({_id: noteId, userId: user._id});
+
+        if (!note) {
+            return res.status(400).json({
+                error: true,
+                message: "Note not found"
+            })
+        }
+
+        if (title) note.title = title;
+        if (content) note.content = content;
+        if (tags) note.tags = tags;
+        if (isPinned) note.isPinned = isPinned;
+
+        await note.save();
+
+        return res.status(200).json({
+            error: false,
+            note,
+            message: "Note updated successfully!"
+        })
+    }
+
+    catch (err) { 
+        return res.status(500).json({
+            error: true,
+            message: "Internal Server Error"
+        })
+    }
+
+})  
 
 app.listen(8000);
 
